@@ -1,0 +1,14 @@
+{
+    "homepage": "https://github.com/camilord/Zeacurity",
+    "description": "Zeacurity is console script to ban IPs with bad intention from the log file",
+    "version": "1.0.18",
+    "require": {
+        "symfony/console": "^5.2",
+        "camilord/utilus": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "camilord\\Zeacurity\\": "./src/Zeacurity/"
+        }
+    }
+}
