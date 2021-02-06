@@ -2,3 +2,5 @@
 *.log
 composer.lock
 vendor
+whitelist.ip.json
+db.conf.json
