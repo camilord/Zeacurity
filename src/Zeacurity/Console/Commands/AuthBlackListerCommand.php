@@ -66,6 +66,9 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
             '=======================------- - - -  -   -',
             '',
         ]);
+        $lines = $this->getAuthLogData($log_file, $is_full_scan, $max_lines);
+
+        print_r($lines);
 
         if (!file_exists($log_file)) {
             echo "Error! File not found.\n\n";
@@ -92,7 +95,7 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
             $output = ob_get_contents();
             ob_end_clean();
 
-            $lines = explode($output, "\n");
+            $lines = explode("\n", $output);
         }
 
 
