@@ -1,9 +1,9 @@
 # Zeacurity
-Parse the server logs and extracts the IP address with bad intentions and block it using iptables
+Parse the server auth logs and extracts the IP address with bad intentions and block it using `iptables`
 
 ## Installation
 - download this package
-- place it somewhere safe
+- place it somewhere safe, like root folder as you will be running this as root
 - import the `db.sql` file
 - run the full scan, sample command below
 - add it to the cron, sample below
