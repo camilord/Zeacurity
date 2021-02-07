@@ -18,15 +18,20 @@ php ./console.php [command-name] [params]
 ### run full scan
 ```bash
 php {path}/console.php auth_blacklist --log-file=/var/log/auth.log --full-scan=y
+php {path}/console.php append_blacklister --firewall-file=./firewall.sh
 ```
 
-### run every 2 hours, but I recommend every hour
+### cron configuration
+- for the auth.log scanner (`auth_blacklist`), recommend to run frequently like every 10-15 mins
+- while for the iptables generation, recommended an every hour or two
+
 ```bash
-0 */2 * * * php {path}/console.php auth_blacklist --log-file=/var/log/auth.log --lines=1500 > /dev/null 2>&1 
+*/15 * * * * php {path}/console.php auth_blacklist --log-file=/var/log/auth.log --lines=1500 > /dev/null 2>&1
+0 */2 * * * php {path}/console.php append_blacklister --firewall-file=./firewall.sh > /dev/null 2>&1
 ```
 
 ### Whitelist IPs
 You can whitelist IP address to exempt from black listing. see `whitelist.ip.json.sample` file and rename it as `whitelist.ip.json`
 
 ### DB credentials
-The db credentials are stored in `db.conf.json`
+The db credentials where being stored in `db.conf.json`
