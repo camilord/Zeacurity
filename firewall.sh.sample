@@ -51,4 +51,4 @@
 /sbin/iptables -A INPUT -j DROP
 /sbin/iptables -A FORWARD -j DROP
 
-/sbin/iptables -L
+/sbin/iptables -nvL
