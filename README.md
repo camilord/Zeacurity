@@ -34,4 +34,4 @@ php {path}/console.php append_blacklister --firewall-file=./firewall.sh
 You can whitelist IP address to exempt from black listing. see `whitelist.ip.json.sample` file and rename it as `whitelist.ip.json`
 
 ### DB credentials
-The db credentials where being stored in `db.conf.json`
+The db credentials where being stored in `db.conf.json` (from `db.conf.json.sample`)
