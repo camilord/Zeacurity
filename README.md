@@ -5,6 +5,8 @@ Parse the server auth logs and extracts the IP address with bad intentions and b
 - download this package
 - place it somewhere safe, like root folder as you will be running this as root
 - import the `db.sql` file
+- find your firewall script (using iptables)
+- add this line: `# {SSH_BLOCK_IPS}` -- means the Zeacurity will insert on that area (see sample `firewall.sh.sample`)
 - run the full scan, sample command below
 - add it to the cron, sample below
 

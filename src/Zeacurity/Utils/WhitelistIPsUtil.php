@@ -13,8 +13,7 @@
  * Time: 10:41 AM
  */
 
-namespace src\Zeacurity\Utils;
-
+namespace camilord\Zeacurity\Utils;
 
 use camilord\utilus\Data\ArrayUtilus;
 

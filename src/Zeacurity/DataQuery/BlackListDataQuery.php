@@ -45,4 +45,13 @@ class BlackListDataQuery extends BaseDataQuery
         $this->getDb()->query($q, [ $ip, $notes ]);
         return (int)$this->getDb()->last_id();
     }
+
+    /**
+     * @return array
+     */
+    public function get_list() {
+        $q = "SELECT * FROM blacklist WHERE deleted IS NULL";
+        $this->getDb()->query($q, []);
+        return $this->getDb()->fetch_all_assoc();
+    }
 }

@@ -21,9 +21,11 @@ require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use camilord\Zeacurity\Console\Commands\AuthBlackListerCommand;
+use camilord\Zeacurity\Console\Commands\AppendBlackListToIpTablesCommand;
 
 $application = new Application();
 
 $application->add(new AuthBlackListerCommand());
+$application->add(new AppendBlackListToIpTablesCommand());
 
 $application->run();

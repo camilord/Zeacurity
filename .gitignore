@@ -4,3 +4,6 @@ composer.lock
 vendor
 whitelist.ip.json
 db.conf.json
+firewall.sh
+backups/*.sh
+cache/*

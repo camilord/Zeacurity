@@ -16,9 +16,12 @@
 namespace camilord\Zeacurity\Console\Commands;
 
 
+use camilord\utilus\IO\ConsoleUtilus;
 use camilord\utilus\IO\SystemUtilus;
 use camilord\utilus\Security\Sanitizer;
 use camilord\utilus\String\ValueValidator;
+use camilord\Zeacurity\DataQuery\BlackListDataQuery;
+use camilord\Zeacurity\Utils\WhitelistIPsUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,18 +35,18 @@ use camilord\Zeacurity\Console\CommandInterface;
  */
 class AuthBlackListerCommand extends BaseCommand implements CommandInterface
 {
+    const REGEX_IP = '/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/i';
+
     protected static $defaultName = 'auth_blacklister';
+    protected static $cache_ips = [];
 
     // configure command
     public function configure()
     {
         parent::configure();
         $this->setName('auth_blacklister')
-            // the short description shown while running "php bin/console list"
-            ->setDescription('Creates a new user.')
-            // the full command description shown when running the command with
-            // the "--help" option
-            ->setHelp('This command allows you to create a user...')
+            ->setDescription('Process auth.log and store the database')
+            ->setHelp('Process auth.log and store the database')
             ->setDefinition([
                 new InputOption('log-file', '', InputOption::VALUE_REQUIRED, 'auth log file location'),
                 new InputOption('full-scan', '', InputOption::VALUE_OPTIONAL, 'full scan on auth log file or scan the last x lines (param --lines)'),
@@ -62,13 +65,15 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
         $max_lines = ($max_lines === 0) ? 1000 : $max_lines;
 
         $output->writeln([
-            "Parsing {$log_file} ...",
+            "Log File: {$log_file}",
             '=======================------- - - -  -   -',
             '',
         ]);
+        echo "Parsing data from {$log_file} ...\n";
         $lines = $this->getAuthLogData($log_file, $is_full_scan, $max_lines);
-
-        print_r($lines);
+        echo "\nProcessing data ...\n";
+        $this->processLogLines($lines);
+        echo "\n";
 
         if (!file_exists($log_file)) {
             echo "Error! File not found.\n\n";
@@ -77,6 +82,7 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
 
         return Command::SUCCESS;
     }
+
 
     /**
      * @param string $log_file
@@ -98,9 +104,12 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
             $lines = explode("\n", $output);
         }
 
-
+        $total = count($lines);
+        $ctr = 0;
         $new_lines = [];
         foreach($lines as $line) {
+            $ctr++;
+            ConsoleUtilus::show_status($ctr, $total);
             if (stripos($line, ': Invalid user') !== false) {
                 $new_lines[] = $line;
             } else if (stripos($line, 'authentication failure') !== false) {
@@ -109,5 +118,38 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
         }
 
         return $new_lines;
+    }
+
+    /**
+     * @param array $lines
+     */
+    private function processLogLines(array $lines)
+    {
+        static $cache_ips = [];
+        $dq = new BlackListDataQuery($this->getDb());
+
+        $total = count($lines);
+        $ctr = 0;
+        foreach($lines as $line)
+        {
+            $ctr++;
+            ConsoleUtilus::show_status($ctr, $total);
+            if (preg_match_all(self::REGEX_IP, $line, $matches))
+            {
+                foreach($matches as $item)
+                {
+                    $ip = trim($item[0]);
+                    if (
+                        filter_var($ip, FILTER_VALIDATE_IP) &&
+                        !in_array($ip, $cache_ips) &&
+                        !$dq->exists($ip) &&
+                        !in_array($ip, WhitelistIPsUtil::getList())
+                    ) {
+                        $dq->add($ip, $line);
+                        $cache_ips[] = $ip;
+                    }
+                }
+            }
+        }
     }
 }
