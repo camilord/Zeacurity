@@ -128,6 +128,7 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
         static $cache_ips = [];
         $dq = new BlackListDataQuery($this->getDb());
 
+        $total_added = 0;
         $total = count($lines);
         $ctr = 0;
         foreach($lines as $line)
@@ -147,9 +148,12 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
                     ) {
                         $dq->add($ip, $line);
                         $cache_ips[] = $ip;
+                        $total_added++;
                     }
                 }
             }
         }
+
+        echo "\nTotal new IPs blocked: {$total_added}\n";
     }
 }

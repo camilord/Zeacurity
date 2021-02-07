@@ -35,3 +35,6 @@ You can whitelist IP address to exempt from black listing. see `whitelist.ip.jso
 
 ### DB credentials
 The db credentials where being stored in `db.conf.json` (from `db.conf.json.sample`)
+
+### Tested OS
+- Ubuntu 20.x
