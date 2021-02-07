@@ -28,14 +28,14 @@
 # BLOCK IPs
 /sbin/iptables -A INPUT -s 117.34.70.33 -j DROP
 
-# Zeacurity rules
-# {SSH_BLOCK_IPS}
-
 # LOCAL NETWORK ACCESS
 /sbin/iptables -A INPUT -s 192.168.1.0/24 -j ACCEPT #SSH LOCAL HOME
 
 #BASIC CHAIN
-/sbin/iptables -I INPUT -p tcp -s 0.0.0.0/0 --dport 22 -j ACCEPT
+# you're office IP, home IP and etc
+
+# Zeacurity rules
+# {SSH_BLOCK_IPS}
 
 #DISABLE PING FLOOD
 /sbin/iptables -A INPUT -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT

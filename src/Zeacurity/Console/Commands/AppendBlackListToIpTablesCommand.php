@@ -77,7 +77,7 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
         $total = count($data);
         if (ArrayUtilus::haveData($data))
         {
-            $template = "/sbin/iptables -A INPUT -s {IP} -j DROP";
+            $template = "/sbin/iptables -A INPUT -p tcp -s {IP} --dport 22 -j DROP";
 
             foreach($data as $item)
             {
@@ -92,28 +92,32 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
         }
         echo "\n";
 
-        // create backup first...
-        echo "Creating backup of your firewall ... ";
-        $firewall_template_file = APP_PATH.'/'.str_replace(".sh", "_template.sh", basename($firewall_file));
-        if (!file_exists($firewall_template_file)) {
-            copy($firewall_file, $firewall_template_file);
+        if (strlen($blacklist) > 5) {
+            // create backup first...
+            echo "Creating backup of your firewall ... ";
+            $firewall_template_file = APP_PATH.'/'.str_replace(".sh", "_template.sh", basename($firewall_file));
+            if (!file_exists($firewall_template_file)) {
+                copy($firewall_file, $firewall_template_file);
+            }
+            $backup_file = APP_PATH.'/backups/'.str_replace(".sh", "_".date('YmdHis').".sh", basename($firewall_file));
+            copy($firewall_file, $backup_file);
+            echo "\t -> OK\n";
+
+            echo "Generating new firewall script ... ";
+            $firewall_content = file_get_contents($firewall_template_file);
+            $firewall_content = str_replace("# {SSH_BLOCK_IPS}", $blacklist, $firewall_content);
+            file_put_contents($firewall_file, $firewall_content);
+            echo "\t -> OK\n";
+
+            echo "Changing permission ... ";
+            system("chmod u+x {$firewall_file}");
+            echo "\t -> OK\n";
+            echo "Executing firewall script ... ";
+            system("bash {$firewall_file}");
+            echo "\t -> OK\n";
+        } else{
+            echo "\nNothing to update as of the moment.";
         }
-        $backup_file = APP_PATH.'/backups/'.str_replace(".sh", "_".date('YmdHis').".sh", basename($firewall_file));
-        copy($firewall_file, $backup_file);
-        echo "\t -> OK\n";
-
-        echo "Generating new firewall script ... ";
-        $firewall_content = file_get_contents($firewall_template_file);
-        $firewall_content = str_replace("# {SSH_BLOCK_IPS}", $blacklist, $firewall_content);
-        file_put_contents($firewall_file, $firewall_content);
-        echo "\t -> OK\n";
-
-        echo "Changing permission ... ";
-        system("chmod u+x {$firewall_file}");
-        echo "\t -> OK\n";
-        echo "Executing firewall script ... ";
-        system("bash {$firewall_file}");
-        echo "\t -> OK\n";
 
         return Command::SUCCESS;
     }
