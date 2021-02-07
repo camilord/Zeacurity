@@ -19,10 +19,7 @@ namespace camilord\Zeacurity\Console\Commands;
 use camilord\utilus\Data\ArrayUtilus;
 use camilord\utilus\IO\ConsoleUtilus;
 use camilord\utilus\IO\SystemUtilus;
-use camilord\utilus\Security\Sanitizer;
-use camilord\utilus\String\ValueValidator;
 use camilord\Zeacurity\DataQuery\BlackListDataQuery;
-use camilord\Zeacurity\Utils\WhitelistIPsUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -36,6 +33,9 @@ use camilord\Zeacurity\Console\CommandInterface;
  */
 class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInterface
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'append_blacklister';
 
     // configure command
@@ -53,6 +53,11 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
             ]);
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $firewall_file = $input->getOption('firewall-file');
