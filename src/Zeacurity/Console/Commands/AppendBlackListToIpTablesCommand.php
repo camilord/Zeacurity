@@ -15,7 +15,6 @@
 
 namespace camilord\Zeacurity\Console\Commands;
 
-
 use camilord\utilus\Data\ArrayUtilus;
 use camilord\utilus\IO\ConsoleUtilus;
 use camilord\utilus\IO\SystemUtilus;
@@ -38,7 +37,9 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
      */
     protected static $defaultName = 'append_blacklister';
 
-    // configure command
+    /**
+     * configure command
+     */
     public function configure()
     {
         parent::configure();

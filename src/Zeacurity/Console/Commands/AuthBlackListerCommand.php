@@ -15,7 +15,6 @@
 
 namespace camilord\Zeacurity\Console\Commands;
 
-
 use camilord\utilus\IO\ConsoleUtilus;
 use camilord\utilus\IO\SystemUtilus;
 use camilord\utilus\Security\Sanitizer;
@@ -37,10 +36,14 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
 {
     const REGEX_IP = '/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/i';
 
+    /**
+     * @var string
+     */
     protected static $defaultName = 'auth_blacklister';
-    protected static $cache_ips = [];
 
-    // configure command
+    /**
+     * configure command
+     */
     public function configure()
     {
         parent::configure();
@@ -54,6 +57,11 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
             ]);
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $log_file = $input->getOption('log-file');
