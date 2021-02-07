@@ -126,10 +126,9 @@ class AuthBlackListerCommand extends BaseCommand implements CommandInterface
                 $new_lines[] = $line;
             } else if (stripos($line, 'Unable to negotiate') !== false) {
                 $new_lines[] = $line;
-            } else if (preg_match(self::REGEX_IP, $line) && stripos($line, 'Accepted') === false) {
+            } else if (stripos($line, 'Failed password') !== false) {
                 $new_lines[] = $line;
             }
-
         }
 
         return $new_lines;
