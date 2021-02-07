@@ -109,10 +109,10 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
         echo "\t -> OK\n";
 
         echo "Changing permission ... ";
-        system("chmod u+x {$firewall_file} &");
+        system("chmod u+x {$firewall_file}");
         echo "\t -> OK\n";
         echo "Executing firewall script ... ";
-        system("bash {$firewall_file} &");
+        system("bash {$firewall_file}");
         echo "\t -> OK\n";
 
         return Command::SUCCESS;
