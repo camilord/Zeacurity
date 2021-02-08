@@ -4,8 +4,9 @@ Parse the server auth logs and extracts the IP address with bad intentions and b
 ## Installation
 - download this package
 - place it somewhere safe, like root folder as you will be running this as root
+- run composer, `php composer.phar install` - to install the packages/vendor
 - import the `db.sql` file
-- find your firewall script (using iptables)
+- find your firewall script (using iptables or see sample `firewall.sh.sample`)
 - add this line: `# {SSH_BLOCK_IPS}` -- means the Zeacurity will insert on that area (see sample `firewall.sh.sample`)
 - run the full scan, sample command below
 - add it to the cron, sample below
