@@ -105,8 +105,10 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
             if (!file_exists($firewall_template_file)) {
                 copy($firewall_file, $firewall_template_file);
             }
-            $backup_file = APP_PATH.'/backups/'.str_replace(".sh", "_".date('YmdHis').".sh", basename($firewall_file));
-            copy($firewall_file, $backup_file);
+            $backup_file = APP_PATH.'/backups/'.str_replace(".sh", "_".date('Ymd').".sh", basename($firewall_file));
+            if (!file_exists($backup_file)) {
+                copy($firewall_file, $backup_file);
+            }
             echo "\t -> OK\n";
 
             echo "Generating new firewall script ... ";
