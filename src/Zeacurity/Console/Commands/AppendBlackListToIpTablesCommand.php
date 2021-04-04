@@ -83,7 +83,7 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
         $total = count($data);
         if (ArrayUtilus::haveData($data))
         {
-            $template = "/sbin/iptables -A INPUT -p tcp -s {IP} --dport 22 -j DROP";
+            $template = "/sbin/iptables -A INPUT -p tcp -s {IP} --dport 22 -j DROP -w";
 
             foreach($data as $item)
             {
