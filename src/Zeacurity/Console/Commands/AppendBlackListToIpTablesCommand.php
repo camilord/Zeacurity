@@ -32,6 +32,9 @@ use camilord\Zeacurity\Console\CommandInterface;
  */
 class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInterface
 {
+    const IP_RANGE = 0;
+    const IP_ADDRESS = 1;
+
     /**
      * @var string
      */
@@ -50,7 +53,9 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
             // the "--help" option
             ->setHelp('Generate new firewall')
             ->setDefinition([
-                new InputOption('firewall-file', '', InputOption::VALUE_REQUIRED, 'firewall you want to append the blacklist')
+                new InputOption('firewall-file', '', InputOption::VALUE_REQUIRED, 'firewall you want to append the blacklist'),
+                new InputOption('max', '', InputOption::VALUE_OPTIONAL, 'max numbers IP from the database'),
+                new InputOption('mode', '', InputOption::VALUE_OPTIONAL, 'block IP address or IP ranges')
             ]);
     }
 
@@ -62,6 +67,8 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $firewall_file = $input->getOption('firewall-file');
+        $max_rows = (int)$input->getOption('max');
+        $block_mode = (int)$input->getOption('mode');
         $firewall_file = SystemUtilus::cleanPath($firewall_file);
 
         if (!file_exists($firewall_file)) {
@@ -69,13 +76,15 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
             return Command::FAILURE;
         }
 
+        $max_rows = ($max_rows === 0) ? 1500 : $max_rows;
+
         $output->writeln([
             "Firewall File: {$firewall_file}",
             '=======================------- - - -  -   -',
             '',
         ]);
         $dq = new BlackListDataQuery($this->getDb());
-        $data = $dq->get_list();
+        $data = $dq->get_list($max_rows);
 
         echo "Loading data to cache: ";
         $blacklist = "";
@@ -83,7 +92,11 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
         $total = count($data);
         if (ArrayUtilus::haveData($data))
         {
-            $template = "/sbin/iptables -A INPUT -p tcp -s {IP} --dport 22 -j DROP -w";
+            if ($block_mode === self::IP_ADDRESS) {
+                $template = "/sbin/iptables -A INPUT -p tcp -s {IP} --dport 22 -j DROP -w";
+            } else {
+                $template = "/sbin/iptables -A INPUT -s {IP} -j DROP -w";
+            }
 
             foreach($data as $item)
             {
@@ -91,7 +104,13 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
                 ConsoleUtilus::show_status($ctr, $total);
 
                 // convert IP address to IP block
-                $ip_block = $this->convert2block_24($item['ip']);
+                $ip_address = isset($item['ip']) ? trim($item['ip']) : false;
+                $ip_block = false;
+                if ($ip_address && $block_mode === self::IP_ADDRESS) {
+                    $ip_block = $ip_address.'/32';
+                } else if ($ip_address) {
+                    $ip_block = $this->convert2block_24($ip_address);
+                }
 
                 // check if its already been added to list
                 if (stripos($blacklist, $ip_block) !== false || !$ip_block) {
@@ -145,6 +164,7 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
     private function convert2block_24($ip) {
         if (filter_var($ip, FILTER_VALIDATE_IP)) {
             $tmp = explode('.', trim($ip));
+            array_pop($tmp);
             $tmp[] = 0;
 
             return implode('.', $tmp).'/24';

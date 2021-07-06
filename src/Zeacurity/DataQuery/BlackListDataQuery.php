@@ -47,10 +47,13 @@ class BlackListDataQuery extends BaseDataQuery
     }
 
     /**
-     * @return array
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
      */
-    public function get_list() {
-        $q = "SELECT * FROM blacklist WHERE deleted IS NULL";
+    public function get_list($limit = 500, $offset = 0) {
+        $q = "SELECT * FROM blacklist WHERE deleted IS NULL ORDER BY id DESC";
+        $q .= vsprintf(" LIMIT %d, %d", [$offset, $limit]);
         $this->getDb()->query($q, []);
         return $this->getDb()->fetch_all_assoc();
     }
