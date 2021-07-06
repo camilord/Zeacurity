@@ -90,10 +90,18 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
                 $ctr++;
                 ConsoleUtilus::show_status($ctr, $total);
 
-                $ip = $item['ip'];
+                // convert IP address to IP block
+                $ip_block = $this->convert2block_24($item['ip']);
+
+                // check if its already been added to list
+                if (stripos($blacklist, $ip_block) !== false || !$ip_block) {
+                    continue;
+                }
+
+                // add it to the list
                 $blacklist .= ($blacklist === "") ?
-                    str_replace("{IP}", $ip, $template) :
-                    "\n".str_replace("{IP}", $ip, $template);
+                    str_replace("{IP}", $ip_block, $template) :
+                    "\n".str_replace("{IP}", $ip_block, $template);
             }
         }
         echo "\n";
@@ -128,5 +136,19 @@ class AppendBlackListToIpTablesCommand extends BaseCommand implements CommandInt
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param $ip
+     * @return false
+     */
+    private function convert2block_24($ip) {
+        if (filter_var($ip, FILTER_VALIDATE_IP)) {
+            $tmp = explode('.', trim($ip));
+            $tmp[] = 0;
+
+            return implode('.', $tmp).'/24';
+        }
+        return false;
     }
 }
